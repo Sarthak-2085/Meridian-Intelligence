@@ -1,0 +1,23 @@
+{
+  "summary": "Phase 2A validated end-to-end. Backend: GET /api/settings default+persisted, PUT /api/settings roundtrip returns identical values with updated_at, GET /api/countries/RU returns row, GET /api/countries/ZZ returns 404. Frontend: Countries page loads with map+list+search (russia -> 1 result), country-detail-RU opens with events+commodities panels, close button clears selection. Predictions page renders all 6 cards (xau/xag/wti/ng/zw/zc) with 6 ProbabilityGauge components and 6 correlation rows. News page filters by impact (all=10 -> high=4) and by search 'gold' (=1). Settings page: watchlist toggles present for XAU/XAG/WTI/NG/ZW/ZC, slider changed 80->83, save-settings shows saved-indicator, page reload confirms 83 persisted via SQLite. Dashboard regression OK (Meridian command room renders map + live wire feed).",
+  "tested_scope": ["backend", "frontend", "integration"],
+  "passed": [
+    "GET /api/settings returns 200 with expected schema",
+    "PUT /api/settings persists and returns updated_at",
+    "GET /api/countries/RU returns 200 with expected fields",
+    "GET /api/countries/ZZ returns 404",
+    "Countries page: map + list + search filter (russia -> 1)",
+    "Countries drill-down: country-detail-RU with events + commodities, close clears selection",
+    "Predictions page: 6 prediction cards + 6 probability gauges + 6 correlation rows",
+    "News page: impact-high filter (10 -> 4) and gold search (-> 1)",
+    "Settings save flow: toggle + slider change -> saved-indicator visible",
+    "Settings persistence: threshold value survives full page reload (SQLite roundtrip)",
+    "Dashboard regression: root page still renders"
+  ],
+  "failed": [],
+  "action_items": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true,
+  "notes": "Commodities detail page intentionally still ComingSoon in Phase 2A per spec — not tested. All mock data endpoints returned jittered but schema-valid responses."
+}

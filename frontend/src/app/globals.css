@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-serif: 'Cormorant Garamond';
+  --font-sans: 'Manrope';
+  --font-mono: 'JetBrains Mono';
+}
+
+html, body {
+  background: #08090B;
+  color: #F8F9FA;
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+::selection { background: rgba(212,175,55,0.25); color: #fff; }
+
+/* Custom scroll */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.4); }
+
+/* Glass utility */
+.glass {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.glass-hover:hover {
+  background: rgba(255,255,255,0.055);
+  border-color: rgba(212,175,55,0.25);
+}
+
+.hair-divider {
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
+  height: 1px;
+}
+
+.editorial-underline {
+  background-image: linear-gradient(to right, #D4AF37, transparent);
+  background-size: 40px 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  padding-bottom: 8px;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  background: #08090B !important;
+  font-family: 'Manrope', sans-serif;
+  outline: none;
+}
+.leaflet-control-attribution {
+  background: rgba(8,9,11,0.6) !important;
+  color: rgba(255,255,255,0.4) !important;
+  font-size: 10px !important;
+}
+.leaflet-control-attribution a { color: rgba(212,175,55,0.7) !important; }
+.leaflet-control-zoom a {
+  background: rgba(255,255,255,0.04) !important;
+  color: #F8F9FA !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(10px);
+}
+.leaflet-control-zoom a:hover { background: rgba(212,175,55,0.15) !important; }
+
+.risk-marker {
+  border-radius: 999px;
+  background: rgba(239,68,68,0.9);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.2), 0 0 30px rgba(239,68,68,0.5);
+}
+.risk-marker::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 2px solid rgba(239,68,68,0.55);
+  animation: pulseRing 2.4s ease-out infinite;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.6); opacity: 0; }
+}

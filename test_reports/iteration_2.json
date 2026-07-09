@@ -1,0 +1,29 @@
+{
+  "summary": "Regression test after code review fixes (useCallback + module-level motion/style constants + useMemo markers). All primary checks pass: no infinite fetch loop, map/cards/animations render, backend healthy, no console errors.",
+  "tested_scope": ["frontend", "backend", "integration"],
+  "passed": [
+    "Backend /api/dashboard, /api/commodities, /api/news, /api/countries, /api/predictions all 200 with correct payload shapes (6 commodities, 10 news, 15 countries, 6 predictions)",
+    "Dashboard page renders (data-testid=dashboard-page visible)",
+    "CRITICAL: exactly 1 /api/dashboard call on initial load, 0 additional over 4s wait — useCallback fix did NOT introduce infinite loop",
+    "WorldMap renders: 32 leaflet tiles loaded, 15 interactive country markers (useMemo refactor OK)",
+    "CommodityCard grid: exactly 6 cards render (XAU/XAG/WTI/NG/ZW/ZC) with module constants refactor",
+    "Refresh button triggers exactly 1 additional /api/dashboard fetch (1 -> 2), page remains visible",
+    "Framer Motion header/map/news animations render on mount (visual confirmed via screenshot)",
+    "0 console errors on dashboard page load and after refresh",
+    "All sidebar routes /news /commodities /countries /predictions /settings return HTTP 200"
+  ],
+  "failed": [
+    {
+      "area": "sidebar navigation (secondary, not in code-review scope)",
+      "issue": "Clicking sidebar 'News Feed' link in Playwright didn't change URL from / to /news (link may not have href or click was intercepted). Direct navigation to /news returns 200. Not a regression from the reviewed changes.",
+      "evidence": "After clicking a[href='/news'], page.url remained '/'. Curl to /news returns HTTP 200 but 'coming soon' text is client-rendered post-hydration and not verified in this pass.",
+      "priority": "LOW"
+    }
+  ],
+  "action_items": [
+    "No blocker action items. Regression clean. Optional: main agent may want to verify sidebar Link components use proper Next.js <Link href> for client-side nav (not part of the reviewed changes)."
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "retest_needed": false,
+  "full_testing_deferred": true
+}

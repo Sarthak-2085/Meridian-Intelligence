@@ -1,0 +1,120 @@
+{
+  "theme_and_archetype": {
+    "domain": "Finance / Intelligence / Data",
+    "theme": "Dark",
+    "archetype": "Archetype 5 (Luxury) mixed with Editorial/Swiss",
+    "rationale": "A geopolitical intelligence dashboard demands authority and precision. The dark theme acts as a command center, while the luxury/editorial typography (serifs for headings) separates it from standard 'tech-bro' SaaS dashboards."
+  },
+  "colors": {
+    "background": {
+      "primary": "#08090B",
+      "secondary": "#111216"
+    },
+    "surface": {
+      "glass": "rgba(255, 255, 255, 0.03)",
+      "glass_hover": "rgba(255, 255, 255, 0.06)",
+      "solid": "#18191E"
+    },
+    "border": {
+      "subtle": "rgba(255, 255, 255, 0.08)",
+      "focus": "rgba(212, 175, 55, 0.5)"
+    },
+    "text": {
+      "primary": "#F8F9FA",
+      "secondary": "#A1A1AA",
+      "muted": "#71717A"
+    },
+    "accents": {
+      "editorial_gold": "#D4AF37",
+      "intelligence_blue": "#3B82F6"
+    },
+    "semantic": {
+      "bullish_low_risk": "#10B981",
+      "bearish_high_risk": "#EF4444",
+      "warning": "#F59E0B"
+    }
+  },
+  "typography": {
+    "font_imports": [
+      "@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap');"
+    ],
+    "headings": {
+      "family": "'Cormorant Garamond', serif",
+      "classes": "font-serif tracking-tight text-white",
+      "usage": "Page titles, large metrics, editorial section headers"
+    },
+    "body": {
+      "family": "'Manrope', sans-serif",
+      "classes": "font-sans text-gray-300",
+      "usage": "Data tables, standard UI text, paragraphs"
+    },
+    "mono": {
+      "family": "'JetBrains Mono', monospace",
+      "classes": "font-mono uppercase tracking-widest text-xs",
+      "usage": "Tickers, AI scores, timestamps, small labels"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl",
+      "h2": "text-2xl md:text-3xl",
+      "h3": "text-xl",
+      "metric_large": "text-3xl md:text-4xl font-serif",
+      "body": "text-base text-gray-300"
+    }
+  },
+  "spacing_and_layout": {
+    "spacing_system": "Generous spacing: p-6 or p-8 for main cards. gap-6 for grid layouts.",
+    "grid_strategy": {
+      "type": "Control Room Grid",
+      "desktop": "grid-cols-12",
+      "tablet": "grid-cols-4",
+      "mobile": "grid-cols-1"
+    },
+    "glassmorphism_protocol": {
+      "classes": "bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-xl",
+      "rules": "Never use glassmorphism without the 1px inner border. Use pure solid colors if layered over complex text to preserve contrast."
+    }
+  },
+  "components": {
+    "commodity_cards": "Glassmorphism cards. Layout: Header (Name + Icon), Body (Large Price + Sparkline Chart), Footer (AI Impact Score + 24h trend). Use JetBrains Mono for the tickers.",
+    "map_widget": "React Leaflet container. Must have pointer-events auto for interactivity. Use 'CartoDB Dark Matter' tiles. Overlay SVG pulse animations for high-risk zones.",
+    "news_feed": "Vertical scroll list. Each item: tiny thumbnail image, serif headline, mono timestamp. Minimal borders between items.",
+    "buttons": "Avoid standard solid blue. Use editorial gold for primary action, or glass ghost buttons (hover:bg-white/10) for secondary.",
+    "charts": "Recharts. Remove default cartesian grid axes lines. Use strokeOpacity=0.2 for grid. Tooltips must have glassmorphism background."
+  },
+  "motion_and_interaction": {
+    "hover_states": "Cards: -translate-y-1 hover:bg-white/[0.06] transition-all duration-300. Buttons: scale-105.",
+    "entrance_animations": "Framer Motion. Stagger children with opacity 0 to 1, y: 10 to 0 over 0.4s ease-out."
+  },
+  "media_urls": [
+    {
+      "category": "news_thumbnail_global",
+      "url": "https://images.unsplash.com/photo-1663427929917-333d88949f7a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwzfHxnbG9iYWwlMjBnZW9wb2xpdGljYWwlMjBzdW1taXQlMjBkYXJrfGVufDB8fHx8MTc4MzA5OTA5NHww&ixlib=rb-4.1.0&q=85",
+      "description": "Earth from space, useful for global geopolitical summit news."
+    },
+    {
+      "category": "news_thumbnail_energy",
+      "url": "https://images.pexels.com/photos/30475898/pexels-photo-30475898.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Oil rig at night, useful for energy/commodity news."
+    },
+    {
+      "category": "news_thumbnail_supply_chain",
+      "url": "https://images.unsplash.com/photo-1621697944804-d0a393f7e01a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwxfHxjYXJnbyUyMHNoaXBwaW5nJTIwY29udGFpbmVycyUyMHBvcnQlMjBuaWdodHxlbnwwfHx8fDE3ODMwOTkwOTR8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Cargo shipping containers, useful for trade/supply chain news."
+    }
+  ],
+  "accessibility": {
+    "testing_attributes": "All interactive and key informational elements MUST include a 'data-testid' attribute (e.g., data-testid='commodity-card-gold').",
+    "contrast": "Maintain 4.5:1 ratio. Text over images must have drop-shadow or dark gradients behind."
+  },
+  "instructions_to_main_agent": [
+    "Phase 1 execution: Build the main Dashboard page.",
+    "Set up Tailwind config with custom colors (background primary/secondary, accents).",
+    "Implement the 'Control Room' grid layout for the dashboard.",
+    "Build the Commodity Cards with Recharts sparklines and AI Impact Scores.",
+    "Integrate React Leaflet map with dark theme.",
+    "Create the News Feed component using the provided media URLs.",
+    "Ensure all components use standard .js/.jsx syntax as per the environment rules, avoiding .tsx extensions.",
+    "Apply Framer Motion for entrance animations.",
+    "Ensure glassmorphism is achieved using Tailwind backdrop-blur and rgba borders."
+  ]
+}

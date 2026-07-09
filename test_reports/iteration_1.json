@@ -1,0 +1,37 @@
+{
+  "summary": "First-finish smoke test of Meridian Geopolitical Market Intelligence Dashboard. All 6 backend endpoints healthy with correct shape. Frontend dashboard loads with sidebar, navbar, world map (Leaflet tiles + 15 markers), news feed (10 items), commodity grid (6 cards w/ sparklines), AI insights (4 items), risk meter (value=54), top movers (5), refresh button, global search. All 5 sidebar nav routes work (/news, /commodities, /countries, /predictions, /settings). Zero console errors. One minor testid deviation on gold/silver commodity cards.",
+  "tested_scope": ["frontend", "backend", "integration"],
+  "passed": [
+    "GET /api/ -> 200 {service:meridian, version:0.1.0, status:ok}",
+    "GET /api/dashboard -> 200 with all 7 required keys (commodities>=6, news>=8, countries=15, insights, global_risk_index, top_movers, updated_at)",
+    "GET /api/commodities -> 200 with 6 items, all required fields incl sparkline array",
+    "GET /api/news -> 200 with 10 items, valid https thumbnails, impact in [high|medium|low]",
+    "GET /api/countries -> 200 with 15 items, lat/lng/risk fields present",
+    "GET /api/predictions -> 200 with 6 items, bullish+bearish=100, trend/signal/correlations present",
+    "Dashboard page loads at REACT_APP_BACKEND_URL with all core testids visible: app-sidebar, app-navbar, global-search, dashboard-page, world-map-widget, news-feed-panel, commodity-grid, ai-insights-panel, risk-meter, risk-value, top-movers, refresh-btn",
+    "Leaflet map: 32 tiles loaded, 15 colored country markers rendered",
+    "News feed shows 10 news items (data-testid pattern news-item-*)",
+    "Commodity grid renders all 6 cards (XAU, XAG, WTI, NG, ZW, ZC) with $-formatted price, AI impact, and Recharts sparkline SVG (12 SVGs in grid = 2 per card)",
+    "AI Insights panel shows 4 insight items with confidence bars",
+    "Risk Meter displays numeric value (54)",
+    "Top Movers shows exactly 5 mover rows (data-testid mover-*)",
+    "Refresh button clickable and re-fetches without page reload",
+    "Global search input accepts typed text ('crude oil')",
+    "All 5 sidebar nav links route correctly: nav-news -> /news, nav-commodities -> /commodities, nav-countries -> /countries, nav-predictions -> /predictions, nav-settings -> /settings",
+    "Zero console errors on dashboard load"
+  ],
+  "failed": [
+    {
+      "area": "Frontend / commodity cards testid naming",
+      "issue": "Review spec expected data-testid='commodity-card-gold' and 'commodity-card-silver', but frontend uses 'commodity-card-xau' and 'commodity-card-xag' (based on symbol lowercase rather than id). Same for commodity-price-<symbol>. Other 4 (wti/ng/zw/zc) coincidentally match both id and symbol.",
+      "evidence": "DOM testids found: [commodity-card-xau, commodity-card-xag, commodity-card-wti, commodity-card-ng, commodity-card-zw, commodity-card-zc]. Cards themselves render correctly with prices, sparklines, AI impact.",
+      "priority": "LOW"
+    }
+  ],
+  "action_items": [
+    "OPTIONAL: In CommodityCard.tsx, align testid to use commodity.id (e.g. 'gold'/'silver') instead of symbol.toLowerCase() to match the review spec exactly. All 6 cards work either way — cosmetic testid alignment only."
+  ],
+  "success_rate": {"backend": "100%", "frontend": "~95% (17/17 core checks pass; only testid naming deviation on 2 of 6 commodity cards)"},
+  "retest_needed": false,
+  "full_testing_deferred": true
+}
