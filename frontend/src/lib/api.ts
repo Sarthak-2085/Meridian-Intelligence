@@ -62,6 +62,15 @@ export type DashboardPayload = {
   updated_at: string;
 };
 
+export type CommodityDetail = Commodity & {
+  history_1d: number[];
+  history_7d: number[];
+  history_30d: number[];
+  history_1y: number[];
+  exposed_countries: string[];
+  related_news: NewsItem[];
+};
+
 export type Prediction = {
   symbol: string;
   name: string;
@@ -95,6 +104,7 @@ export const api = {
   dashboard: () => get<DashboardPayload>('/api/dashboard'),
   news: () => get<NewsItem[]>('/api/news'),
   commodities: () => get<Commodity[]>('/api/commodities'),
+  commodityDetail: (symbol: string) => get<CommodityDetail>(`/api/commodities/${symbol}`),
   countries: () => get<CountryRisk[]>('/api/countries'),
   country: (code: string) => get<CountryRisk>(`/api/countries/${code}`),
   predictions: () => get<Prediction[]>('/api/predictions'),

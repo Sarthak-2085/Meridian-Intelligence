@@ -14,6 +14,10 @@ import json
 import random
 import os
 import logging
+from dotenv import load_dotenv
+from anthropic import Anthropic
+
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # App bootstrap
@@ -26,6 +30,9 @@ api = APIRouter(prefix="/api")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("meridian")
+
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+claude_client = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
 
 app.add_middleware(
     CORSMiddleware,
@@ -288,6 +295,55 @@ def mock_insights() -> List[Insight]:
     ]
 
 
+def ai_insights(news: List[NewsItem], commodities: List[Commodity]) -> List[Insight]:
+    """Ask Claude to derive insights from the current news + commodity snapshot.
+    Falls back to the mock pool if no API key is configured or the call fails.
+    """
+    if not claude_client:
+        return mock_insights()
+
+    news_block = "\n".join(f"- {n.headline} ({n.source}, {n.region}, impact={n.impact})" for n in news[:8])
+    price_block = "\n".join(f"- {c.name} ({c.symbol}): ${c.price} 24h={c.change_24h}% sentiment={c.sentiment}" for c in commodities)
+
+    prompt = f"""You are a market intelligence analyst. Given the following live news headlines and commodity prices, produce exactly 4 concise insights connecting geopolitical events to commodity price moves.
+
+NEWS:
+{news_block}
+
+COMMODITY PRICES:
+{price_block}
+
+Respond ONLY with a JSON array of exactly 4 objects, no preamble, no markdown fences. Each object must have:
+- "title": short headline, max 8 words
+- "detail": 1-2 sentence analysis connecting a specific news item to a specific commodity move
+- "confidence": integer 55-95
+- "tag": one word category, e.g. ENERGY, MACRO, AGRI, FX, LOGISTICS
+"""
+
+    try:
+        response = claude_client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=800,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = "".join(block.text for block in response.content if block.type == "text").strip()
+        text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        parsed = json.loads(text)
+        return [
+            Insight(
+                id=f"i-{i+1}",
+                title=item["title"],
+                detail=item["detail"],
+                confidence=int(item.get("confidence", 70)),
+                tag=item.get("tag", "MACRO"),
+            )
+            for i, item in enumerate(parsed[:4])
+        ]
+    except Exception as e:
+        logger.warning(f"Claude insight generation failed, falling back to mock: {e}")
+        return mock_insights()
+
+
 def mock_top_movers(commodities: List[Commodity]) -> List[Mover]:
     ranked = sorted(commodities, key=lambda c: abs(c.change_24h), reverse=True)[:5]
     return [
@@ -333,6 +389,36 @@ def root():
 @api.get("/commodities", response_model=List[Commodity])
 def commodities_route():
     return mock_commodities()
+
+
+class CommodityDetail(Commodity):
+    history_1d: List[float]
+    history_7d: List[float]
+    history_30d: List[float]
+    history_1y: List[float]
+    exposed_countries: List[str]
+    related_news: List[NewsItem]
+
+
+@api.get("/commodities/{symbol}", response_model=CommodityDetail)
+def commodity_detail_route(symbol: str):
+    all_c = mock_commodities()
+    match = next((c for c in all_c if c.symbol.upper() == symbol.upper() or c.id.upper() == symbol.upper()), None)
+    if not match:
+        raise HTTPException(status_code=404, detail=f"Commodity {symbol} not found")
+
+    exposed = [country.name for country in mock_countries() if match.symbol in country.affected_commodities]
+    related = [n for n in mock_news() if match.symbol in n.affected_commodities]
+
+    return CommodityDetail(
+        **match.model_dump(),
+        history_1d=_sparkline(match.price, points=24, vol=0.006),
+        history_7d=_sparkline(match.price, points=28, vol=0.015),
+        history_30d=_sparkline(match.price, points=30, vol=0.02),
+        history_1y=_sparkline(match.price, points=52, vol=0.05),
+        exposed_countries=exposed,
+        related_news=related,
+    )
 
 
 @api.get("/news", response_model=List[NewsItem])
@@ -393,11 +479,12 @@ def country_by_code(code: str):
 @api.get("/dashboard", response_model=DashboardPayload)
 def dashboard_route():
     commodities = mock_commodities()
+    news = mock_news()
     payload = DashboardPayload(
         commodities=commodities,
-        news=mock_news(),
+        news=news,
         countries=mock_countries(),
-        insights=mock_insights(),
+        insights=ai_insights(news, commodities),
         global_risk_index=random.randint(48, 74),
         top_movers=mock_top_movers(commodities),
         updated_at=datetime.now(timezone.utc).isoformat(),
