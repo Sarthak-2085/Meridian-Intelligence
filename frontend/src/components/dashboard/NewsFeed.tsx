@@ -1,25 +1,31 @@
-'use client';
-import { motion } from 'framer-motion';
-import type { NewsItem } from '@/lib/api';
-import { timeAgo } from '@/lib/utils';
-import { ArrowUpRight } from 'lucide-react';
+"use client";
+import { motion } from "framer-motion";
+import type { NewsItem } from "@/lib/api";
+import { timeAgo } from "@/lib/utils";
+import { ArrowUpRight } from "lucide-react";
 
 const impactStyles: Record<string, string> = {
-  high: 'text-bear border-bear/40 bg-bear/5',
-  medium: 'text-warn border-warn/40 bg-warn/5',
-  low: 'text-bull border-bull/40 bg-bull/5',
+  high: "text-bear border-bear/40 bg-bear/5",
+  medium: "text-warn border-warn/40 bg-warn/5",
+  low: "text-bull border-bull/40 bg-bull/5",
 };
 
 export function NewsFeed({ news }: { news: NewsItem[] }) {
   return (
-    <div className="glass rounded-2xl h-full flex flex-col" data-testid="news-feed-panel">
+    <div
+      className="glass rounded-2xl h-full flex flex-col"
+      data-testid="news-feed-panel"
+    >
       <div className="px-6 pt-6 pb-4 flex items-baseline justify-between">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">Live Wire</div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
+            Live Wire
+          </div>
           <h3 className="font-serif text-2xl mt-1">Geopolitical Feed</h3>
         </div>
         <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white/50">
-          <span className="h-1.5 w-1.5 rounded-full bg-bull animate-pulse" /> Streaming
+          <span className="h-1.5 w-1.5 rounded-full bg-bull animate-pulse" />{" "}
+          Streaming
         </span>
       </div>
       <div className="hair-divider mx-6" />
@@ -40,7 +46,9 @@ export function NewsFeed({ news }: { news: NewsItem[] }) {
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <span className={`text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border ${impactStyles[n.impact]}`}>
+                <span
+                  className={`text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border ${impactStyles[n.impact]}`}
+                >
                   {n.impact}
                 </span>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-white/40 truncate">
@@ -56,7 +64,10 @@ export function NewsFeed({ news }: { news: NewsItem[] }) {
                 </span>
                 <div className="flex gap-1">
                   {n.affected_commodities.slice(0, 3).map((c) => (
-                    <span key={c} className="text-[10px] font-mono uppercase text-editorial-gold/70 border border-editorial-gold/20 rounded px-1.5">
+                    <span
+                      key={c}
+                      className="text-[10px] font-mono uppercase text-editorial-gold/70 border border-editorial-gold/20 rounded px-1.5"
+                    >
                       {c}
                     </span>
                   ))}

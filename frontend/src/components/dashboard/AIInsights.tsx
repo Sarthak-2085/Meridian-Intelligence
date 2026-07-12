@@ -1,7 +1,7 @@
-'use client';
-import { motion } from 'framer-motion';
-import type { Insight } from '@/lib/api';
-import { Sparkles } from 'lucide-react';
+"use client";
+import { motion } from "framer-motion";
+import type { Insight } from "@/lib/api";
+import { Sparkles } from "lucide-react";
 
 export function AIInsights({ insights }: { insights: Insight[] }) {
   return (
@@ -11,8 +11,12 @@ export function AIInsights({ insights }: { insights: Insight[] }) {
           <Sparkles className="h-4 w-4 text-editorial-gold" />
         </div>
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">Signal</div>
-          <h3 className="font-serif text-xl leading-none mt-0.5">AI Insights</h3>
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
+            Signal
+          </div>
+          <h3 className="font-serif text-xl leading-none mt-0.5">
+            AI Insights
+          </h3>
         </div>
       </div>
       <div className="hair-divider my-5" />
@@ -32,13 +36,22 @@ export function AIInsights({ insights }: { insights: Insight[] }) {
               </span>
               <div className="ml-auto flex items-center gap-1.5">
                 <div className="h-1 w-10 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div className="h-full bg-editorial-gold" style={{ width: `${i.confidence}%` }} />
+                  <div
+                    className="h-full bg-editorial-gold"
+                    style={{ width: `${i.confidence}%` }}
+                  />
                 </div>
-                <span className="font-mono text-[10px] text-white/60">{i.confidence}%</span>
+                <span className="font-mono text-[10px] text-white/60">
+                  {i.confidence}%
+                </span>
               </div>
             </div>
-            <div className="font-serif text-[17px] leading-snug text-white/95">{i.title}</div>
-            <p className="text-[13px] text-white/60 mt-1 leading-relaxed">{i.detail}</p>
+            <div className="font-serif text-[17px] leading-snug text-white/95">
+              {i.title}
+            </div>
+            <p className="text-[13px] text-white/60 mt-1 leading-relaxed">
+              {i.detail}
+            </p>
             {idx < insights.length - 1 && <div className="hair-divider mt-4" />}
           </motion.div>
         ))}

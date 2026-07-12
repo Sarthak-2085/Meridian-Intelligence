@@ -1,20 +1,20 @@
-'use client';
-import { Search, Bell, Command } from 'lucide-react';
-import { useEffect, useState } from 'react';
+"use client";
+import { Search, Bell, Command } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
-  const [now, setNow] = useState('');
+  const [now, setNow] = useState("");
   useEffect(() => {
     const tick = () => {
       const d = new Date();
       setNow(
-        d.toLocaleString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          timeZone: 'UTC',
+        d.toLocaleString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "UTC",
           hour12: false,
-        }) + ' UTC'
+        }) + " UTC",
       );
     };
     tick();

@@ -5,42 +5,62 @@ FastAPI + SQLite. Mock/illustrative data only. No paid APIs.
 from __future__ import annotations
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 import sqlite3
 import json
 import random
-import os
 import logging
-from dotenv import load_dotenv
-from anthropic import Anthropic
+import time
+from groq import Groq
 
-load_dotenv()
+import config
 
 # ---------------------------------------------------------------------------
 # App bootstrap
 # ---------------------------------------------------------------------------
-ROOT_DIR = Path(__file__).parent
-DB_PATH = ROOT_DIR / "meridian.db"
+DB_PATH = config.DB_PATH
 
 app = FastAPI(title="Meridian Intelligence API", version="0.1.0")
 api = APIRouter(prefix="/api")
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=config.LOG_LEVEL)
 logger = logging.getLogger("meridian")
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-claude_client = Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
+groq_client = Groq(api_key=config.GROQ_API_KEY) if config.GROQ_API_KEY else None
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=config.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    start = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        duration_ms = (time.perf_counter() - start) * 1000
+        logger.exception(f"{request.method} {request.url.path} -> 500 ({duration_ms:.0f}ms)")
+        raise
+    duration_ms = (time.perf_counter() - start) * 1000
+    logger.info(f"{request.method} {request.url.path} -> {response.status_code} ({duration_ms:.0f}ms)")
+    return response
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request, exc):
+    logger.exception(f"Unhandled error on {request.method} {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error. Check backend logs for details."},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -296,10 +316,10 @@ def mock_insights() -> List[Insight]:
 
 
 def ai_insights(news: List[NewsItem], commodities: List[Commodity]) -> List[Insight]:
-    """Ask Claude to derive insights from the current news + commodity snapshot.
+    """Ask Groq (Llama) to derive insights from the current news + commodity snapshot.
     Falls back to the mock pool if no API key is configured or the call fails.
     """
-    if not claude_client:
+    if not groq_client:
         return mock_insights()
 
     news_block = "\n".join(f"- {n.headline} ({n.source}, {n.region}, impact={n.impact})" for n in news[:8])
@@ -321,12 +341,12 @@ Respond ONLY with a JSON array of exactly 4 objects, no preamble, no markdown fe
 """
 
     try:
-        response = claude_client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=800,
+        response = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
+            max_tokens=800,
         )
-        text = "".join(block.text for block in response.content if block.type == "text").strip()
+        text = response.choices[0].message.content.strip()
         text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         parsed = json.loads(text)
         return [
@@ -340,7 +360,7 @@ Respond ONLY with a JSON array of exactly 4 objects, no preamble, no markdown fe
             for i, item in enumerate(parsed[:4])
         ]
     except Exception as e:
-        logger.warning(f"Claude insight generation failed, falling back to mock: {e}")
+        logger.warning(f"Groq insight generation failed, falling back to mock: {e}")
         return mock_insights()
 
 

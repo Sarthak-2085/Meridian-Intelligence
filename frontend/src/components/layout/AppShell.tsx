@@ -1,6 +1,6 @@
-'use client';
-import { Sidebar } from './Sidebar';
-import { Navbar } from './Navbar';
+"use client";
+import { Sidebar } from "./Sidebar";
+import { Navbar } from "./Navbar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +12,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
         <footer className="px-6 lg:px-10 py-6 text-xs font-mono uppercase tracking-widest text-white/30 border-t border-white/5">
-          <span className="text-editorial-gold/70">Meridian</span> · Geopolitical Intelligence · v0.1 · All data is illustrative
+          <span className="text-editorial-gold/70">Meridian</span> ·
+          Geopolitical Intelligence · v0.1 · All data is illustrative
         </footer>
       </div>
     </div>

@@ -1,19 +1,19 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function fmt(n: number, digits = 2) {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(n);
 }
 
 export function fmtPct(n: number) {
-  const s = n >= 0 ? '+' : '';
+  const s = n >= 0 ? "+" : "";
   return `${s}${n.toFixed(2)}%`;
 }
 

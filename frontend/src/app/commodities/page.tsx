@@ -1,11 +1,11 @@
-'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { api, type Commodity } from '@/lib/api';
-import { CommodityCard } from '@/components/dashboard/CommodityCard';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { AlertCircle, RefreshCcw } from 'lucide-react';
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { api, type Commodity } from "@/lib/api";
+import { CommodityCard } from "@/components/dashboard/CommodityCard";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { AlertCircle, RefreshCcw } from "lucide-react";
 
 export default function CommoditiesPage() {
   const [data, setData] = useState<Commodity[] | null>(null);
@@ -18,7 +18,7 @@ export default function CommoditiesPage() {
       setErr(null);
       setData(await api.commodities());
     } catch (e: any) {
-      setErr(e?.message || 'Unknown error');
+      setErr(e?.message || "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -30,11 +30,15 @@ export default function CommoditiesPage() {
 
   if (err) {
     return (
-      <div className="glass rounded-2xl p-10 flex flex-col items-center text-center gap-4" data-testid="commodities-error">
+      <div
+        className="glass rounded-2xl p-10 flex flex-col items-center text-center gap-4"
+        data-testid="commodities-error"
+      >
         <AlertCircle className="h-10 w-10 text-bear" />
         <div className="font-serif text-2xl">Signal lost.</div>
         <div className="text-white/60 text-sm max-w-md">
-          We couldn&apos;t reach the intelligence feed. Please check your backend and try again.
+          We couldn&apos;t reach the intelligence feed. Please check your
+          backend and try again.
         </div>
         <button
           onClick={load}
@@ -48,10 +52,19 @@ export default function CommoditiesPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">Markets</div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
+          Markets
+        </div>
         <h1 className="font-serif text-3xl mt-1">Commodities</h1>
-        <p className="text-white/50 text-sm mt-1">Live prices, sentiment, and AI impact scoring across all tracked assets.</p>
+        <p className="text-white/50 text-sm mt-1">
+          Live prices, sentiment, and AI impact scoring across all tracked
+          assets.
+        </p>
       </motion.div>
 
       {loading ? (
@@ -63,7 +76,11 @@ export default function CommoditiesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {data?.map((c, i) => (
-            <Link key={c.id} href={`/commodities/${c.symbol}`} className="block">
+            <Link
+              key={c.id}
+              href={`/commodities/${c.symbol}`}
+              className="block"
+            >
               <CommodityCard c={c} index={i} />
             </Link>
           ))}
