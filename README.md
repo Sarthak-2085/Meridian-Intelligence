@@ -4,7 +4,6 @@
 
 🔗 **Live site:** https://meridian-intelligence-sandy.vercel.app
 
-![Dashboard](docs/screenshots/01-Dashboard.png)
 ![Prediction](docs/screenshots/04-prediction-engine.png)
 ![Countries](docs/screenshots/05-country-analysis.png)
 
