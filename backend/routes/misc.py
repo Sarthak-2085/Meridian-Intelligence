@@ -4,7 +4,8 @@ from typing import List
 import json
 
 from schemas.models import NewsItem, CountryRisk, Prediction, Settings
-from services.mock_data import mock_news, mock_countries, mock_commodities, mock_predictions
+from services.mock_data import mock_countries, mock_commodities, mock_predictions
+from services.news_service import live_news
 from database import get_conn, save_snapshot
 
 router = APIRouter()
@@ -17,7 +18,7 @@ def root():
 
 @router.get("/news", response_model=List[NewsItem])
 def news_route():
-    return mock_news()
+    return live_news()
 
 
 @router.get("/countries", response_model=List[CountryRisk])

@@ -27,6 +27,14 @@ class NewsItem(BaseModel):
     impact: Literal["high", "medium", "low"]
     thumbnail: str
     affected_commodities: List[str]
+    url: Optional[str] = None
+    # AI enrichment (optional - old consumers unaffected)
+    ai_summary: Optional[str] = None
+    event_type: Optional[str] = None
+    affected_countries: List[str] = Field(default_factory=list)
+    market_sentiment: Optional[Literal["Bullish", "Bearish", "Neutral"]] = None
+    geopolitical_risk: Optional[int] = None
+    short_market_impact: Optional[str] = None
 
 
 class CountryRisk(BaseModel):

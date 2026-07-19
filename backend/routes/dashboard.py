@@ -6,9 +6,9 @@ import random
 import logging
 
 from schemas.models import DashboardPayload
-from services.mock_data import mock_news, mock_countries, mock_top_movers
+from services.mock_data import mock_countries, mock_top_movers, mock_commodities
 from services.price_service import live_commodities
-from services.mock_data import mock_commodities
+from services.news_service import live_news
 from services.ai_service import ai_insights
 from database import save_snapshot
 
@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("/dashboard", response_model=DashboardPayload)
 def dashboard_route():
     commodities = live_commodities() or mock_commodities()
-    news = mock_news()
+    news = live_news()  # cached + AI-enriched; shared with /news route
     payload = DashboardPayload(
         commodities=commodities,
         news=news,
