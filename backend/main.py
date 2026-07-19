@@ -56,7 +56,9 @@ api.include_router(commodities.router)
 api.include_router(misc.router)
 app.include_router(api)
 
-
+@app.get("/ping")
+def ping():
+    return {"status": "ok"}
 @app.on_event("startup")
 def _startup():
     init_db()
