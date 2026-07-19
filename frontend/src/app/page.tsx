@@ -1,41 +1,30 @@
-"use client";
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { api, type DashboardPayload } from "@/lib/api";
-import { CommodityCard } from "@/components/dashboard/CommodityCard";
-import { NewsFeed } from "@/components/dashboard/NewsFeed";
-import { AIInsights } from "@/components/dashboard/AIInsights";
-import { RiskMeter } from "@/components/dashboard/RiskMeter";
-import { TopMovers } from "@/components/dashboard/TopMovers";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { AlertCircle, RefreshCcw } from "lucide-react";
+'use client';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { api, type DashboardPayload } from '@/lib/api';
+import { CommodityCard } from '@/components/dashboard/CommodityCard';
+import { NewsFeed } from '@/components/dashboard/NewsFeed';
+import { AIInsights } from '@/components/dashboard/AIInsights';
+import { RiskMeter } from '@/components/dashboard/RiskMeter';
+import { TopMovers } from '@/components/dashboard/TopMovers';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 
-const WorldMap = dynamic(() => import("@/components/dashboard/WorldMap"), {
+const WorldMap = dynamic(() => import('@/components/dashboard/WorldMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
 
-const HEADER_MOTION = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-};
-const MAP_MOTION = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay: 0.1, duration: 0.5 },
-};
-const NEWS_MOTION = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  transition: { delay: 0.15, duration: 0.5 },
-};
+const HEADER_MOTION = { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5 } };
+const MAP_MOTION    = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.1,  duration: 0.5 } };
+const NEWS_MOTION   = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay: 0.15, duration: 0.5 } };
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -44,7 +33,7 @@ export default function DashboardPage() {
       const d = await api.dashboard();
       setData(d);
     } catch (e: any) {
-      setErr(e?.message || "Unknown error");
+      setErr(e?.message || 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -56,15 +45,11 @@ export default function DashboardPage() {
 
   if (err) {
     return (
-      <div
-        className="glass rounded-2xl p-10 flex flex-col items-center text-center gap-4"
-        data-testid="dashboard-error"
-      >
+      <div className="glass rounded-2xl p-10 flex flex-col items-center text-center gap-4" data-testid="dashboard-error">
         <AlertCircle className="h-10 w-10 text-bear" />
         <div className="font-serif text-2xl">Signal lost.</div>
         <div className="text-white/60 text-sm max-w-md">
-          We couldn&apos;t reach the intelligence feed. Please check your
-          backend and try again.
+          We couldn&apos;t reach the intelligence feed. Please check your backend and try again.
         </div>
         <button
           onClick={load}
@@ -102,25 +87,17 @@ export default function DashboardPage() {
       >
         <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
-            Command Room ·{" "}
-            {new Date(data.updated_at).toUTCString().slice(17, 25)} UTC
+            Command Room · {new Date(data.updated_at).toUTCString().slice(17, 25)} UTC
           </div>
           <h1 className="font-serif text-4xl md:text-5xl mt-2 tracking-tight">
-            Global Intelligence,{" "}
-            <em className="text-editorial-gold not-italic">
-              read at a glance.
-            </em>
+            Global Intelligence, <em className="text-editorial-gold not-italic">read at a glance.</em>
           </h1>
           <p className="text-white/55 mt-3 max-w-2xl text-[15px] leading-relaxed">
-            Meridian correlates geopolitics with commodity markets in real time.
-            Every card here is an actionable signal.
+            Meridian correlates geopolitics with commodity markets in real time. Every card here is an actionable signal.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button
-            className="h-10 px-4 rounded-lg glass hover:bg-white/[0.06] font-mono text-[11px] uppercase tracking-widest text-white/80"
-            data-testid="filter-btn"
-          >
+          <button className="h-10 px-4 rounded-lg glass hover:bg-white/[0.06] font-mono text-[11px] uppercase tracking-widest text-white/80" data-testid="filter-btn">
             All Regions
           </button>
           <button
@@ -133,29 +110,72 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
+      {/* Market overview strip */}
+      <motion.div
+        {...HEADER_MOTION}
+        className="glass rounded-2xl p-4 flex flex-wrap items-center gap-x-8 gap-y-3"
+        data-testid="market-overview"
+      >
+        {(() => {
+          const up = data.commodities.filter((c) => c.change_24h > 0).length;
+          const down = data.commodities.filter((c) => c.change_24h < 0).length;
+          const avgRisk = Math.round(data.countries.reduce((s, c) => s + c.overall_risk, 0) / (data.countries.length || 1));
+          const secondsAgo = Math.max(0, Math.round((Date.now() - new Date(data.updated_at).getTime()) / 1000));
+          return (
+            <>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">Movers</div>
+                <div className="text-sm mt-0.5">
+                  <span className="text-bull">{up} up</span>
+                  <span className="text-white/30 mx-1.5">/</span>
+                  <span className="text-bear">{down} down</span>
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">Avg Country Risk</div>
+                <div className="text-sm mt-0.5 text-white/85">{avgRisk} / 100</div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-white/40">Active Headlines</div>
+                <div className="text-sm mt-0.5 text-white/85">{data.news.length} tracked</div>
+              </div>
+              <div className="relative flex-1 min-w-[200px] max-w-xs">
+                <input
+                  data-testid="dashboard-commodity-search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Filter commodities…"
+                  className="w-full h-8 px-3 rounded-md bg-white/[0.03] border border-white/[0.08] text-xs placeholder:text-white/30 focus:outline-none focus:border-editorial-gold/40"
+                />
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-bull animate-pulse" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
+                  Updated {secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.round(secondsAgo / 60)}m ago`}
+                </span>
+              </div>
+            </>
+          );
+        })()}
+      </motion.div>
+
       {/* Row 1: map + news */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <motion.div
           {...MAP_MOTION}
-          className="lg:col-span-8 glass rounded-2xl overflow-hidden relative"
-          style={{ minHeight: 480 }}
+          className="lg:col-span-8 glass rounded-2xl overflow-hidden relative h-[560px]"
           data-testid="world-map-widget"
         >
           <div className="absolute top-4 right-6 z-[400] text-right pointer-events-none">
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
-              World
-            </div>
-            <h3 className="font-serif text-2xl mt-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-              Risk Atlas
-            </h3>
+            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">World</div>
+            <h3 className="font-serif text-2xl mt-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">Risk Atlas</h3>
           </div>
           <WorldMap countries={data.countries} />
         </motion.div>
 
         <motion.div
           {...NEWS_MOTION}
-          className="lg:col-span-4"
-          style={{ minHeight: 480 }}
+          className="lg:col-span-4 h-[560px]"
         >
           <NewsFeed news={data.news} />
         </motion.div>
@@ -165,23 +185,23 @@ export default function DashboardPage() {
       <div>
         <div className="flex items-baseline justify-between mb-4">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
-              Commodities
-            </div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">Commodities</div>
             <h2 className="font-serif text-2xl md:text-3xl mt-1">The Ledger</h2>
           </div>
           <span className="font-mono text-[10px] uppercase tracking-widest text-white/40">
             Updated {new Date(data.updated_at).toLocaleTimeString()}
           </span>
         </div>
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          data-testid="commodity-grid"
-        >
-          {data.commodities.map((c, i) => (
-            <CommodityCard key={c.id} c={c} index={i} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="commodity-grid">
+          {data.commodities
+            .filter((c) => !query.trim() || c.name.toLowerCase().includes(query.toLowerCase()) || c.symbol.toLowerCase().includes(query.toLowerCase()))
+            .map((c, i) => (
+              <CommodityCard key={c.id} c={c} index={i} />
+            ))}
         </div>
+        {query.trim() && data.commodities.filter((c) => c.name.toLowerCase().includes(query.toLowerCase()) || c.symbol.toLowerCase().includes(query.toLowerCase())).length === 0 && (
+          <div className="text-center text-white/40 text-sm py-8">No commodities match "{query}".</div>
+        )}
       </div>
 
       {/* Row 3: insights + risk + movers */}

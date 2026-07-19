@@ -1,28 +1,20 @@
-"use client";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  YAxis,
-  XAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
-import { api, type Prediction } from "@/lib/api";
-import { ProbabilityGauge } from "@/components/predictions/ProbabilityGauge";
-import { Skeleton } from "@/components/ui/Skeleton";
-import { fmt } from "@/lib/utils";
+'use client';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip, CartesianGrid } from 'recharts';
+import { api, type Prediction } from '@/lib/api';
+import { ProbabilityGauge } from '@/components/predictions/ProbabilityGauge';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { fmt } from '@/lib/utils';
 
 const TOOLTIP_STYLE = {
-  background: "rgba(24,25,30,0.9)",
-  border: "1px solid rgba(255,255,255,0.08)",
+  background: 'rgba(24,25,30,0.9)',
+  border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: 8,
   fontSize: 11,
-  fontFamily: "JetBrains Mono",
-  color: "#fff",
-  backdropFilter: "blur(20px)",
+  fontFamily: 'JetBrains Mono',
+  color: '#fff',
+  backdropFilter: 'blur(20px)',
 } as const;
 
 function CorrelationRow({ label, value }: { label: string; value: number }) {
@@ -30,27 +22,21 @@ function CorrelationRow({ label, value }: { label: string; value: number }) {
   const positive = value >= 0;
   return (
     <div className="flex items-center gap-3">
-      <span className="font-mono text-[10px] uppercase tracking-widest text-white/50 w-10">
-        {label}
-      </span>
+      <span className="font-mono text-[10px] uppercase tracking-widest text-white/50 w-10">{label}</span>
       <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full relative overflow-hidden">
         <span className="absolute left-1/2 top-0 bottom-0 w-px bg-white/15" />
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${width / 2}%` }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
           className="absolute top-0 bottom-0 rounded-full"
           style={{
-            [positive ? "left" : "right"]: "50%",
-            background: positive ? "#10B981" : "#EF4444",
+            [positive ? 'left' : 'right']: '50%',
+            background: positive ? '#10B981' : '#EF4444',
           }}
         />
       </div>
-      <span
-        className={`font-mono text-xs w-12 text-right ${positive ? "text-bull" : "text-bear"}`}
-      >
-        {value.toFixed(2)}
-      </span>
+      <span className={`font-mono text-xs w-12 text-right ${positive ? 'text-bull' : 'text-bear'}`}>{value.toFixed(2)}</span>
     </div>
   );
 }
@@ -71,54 +57,58 @@ function PredictionCard({ p, index }: { p: Prediction; index: number }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
-            {p.symbol} · {p.horizon_days}D horizon
-          </div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">{p.symbol} · {p.horizon_days}D horizon</div>
           <h3 className="font-serif text-2xl mt-1">{p.name}</h3>
         </div>
-        <ProbabilityGauge
-          bullish={p.bullish_probability}
-          bearish={p.bearish_probability}
-          signal={p.signal}
-          size={140}
-        />
+        <ProbabilityGauge bullish={p.bullish_probability} bearish={p.bearish_probability} signal={p.signal} size={140} />
       </div>
 
       <div className="hair-divider my-5" />
 
-      <div className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-2">
-        Forecast Trend
-      </div>
+      <div className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-2">Forecast Trend</div>
       <div className="h-32 -mx-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <CartesianGrid
-              stroke="rgba(255,255,255,0.06)"
-              strokeDasharray="2 4"
-            />
+            <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="2 4" />
             <XAxis dataKey="i" hide />
-            <YAxis hide domain={["dataMin", "dataMax"]} />
-            <Tooltip
-              contentStyle={TOOLTIP_STYLE}
-              formatter={(v: any) => [`$${fmt(v)}`, ""]}
-              labelFormatter={() => ""}
-            />
-            <Line
-              type="monotone"
-              dataKey="v"
-              stroke={isBull ? "#10B981" : "#EF4444"}
-              strokeWidth={2}
-              dot={false}
-            />
+            <YAxis hide domain={['dataMin', 'dataMax']} />
+            <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: any) => [`$${fmt(v)}`, '']} labelFormatter={() => ''} />
+            <Line type="monotone" dataKey="v" stroke={isBull ? '#10B981' : '#EF4444'} strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <div className="hair-divider my-5" />
 
-      <div className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-3">
-        Historical Correlations
+      <div className="flex items-center justify-between mb-3">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-white/50">AI Read</div>
+        <div className="flex items-center gap-2">
+          {p.predicted_direction && (
+            <span className={`text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border ${
+              p.predicted_direction === 'Up' ? 'text-bull border-bull/40 bg-bull/5' :
+              p.predicted_direction === 'Down' ? 'text-bear border-bear/40 bg-bear/5' :
+              'text-white/60 border-white/20 bg-white/5'
+            }`}>{p.predicted_direction}</span>
+          )}
+          {p.risk_level && (
+            <span className={`text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border ${
+              p.risk_level === 'High' ? 'text-bear border-bear/40 bg-bear/5' :
+              p.risk_level === 'Medium' ? 'text-warn border-warn/40 bg-warn/5' :
+              'text-bull border-bull/40 bg-bull/5'
+            }`}>{p.risk_level} risk</span>
+          )}
+          {typeof p.confidence === 'number' && (
+            <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">{p.confidence}% conf · {p.time_horizon}</span>
+          )}
+        </div>
       </div>
+      {p.reasoning && (
+        <p className="text-white/70 text-sm leading-relaxed mb-2">{p.reasoning}</p>
+      )}
+
+      <div className="hair-divider my-5" />
+
+      <div className="font-mono text-[10px] uppercase tracking-widest text-white/50 mb-3">Historical Correlations</div>
       <div className="space-y-3" data-testid={`corr-${p.symbol.toLowerCase()}`}>
         {p.correlations.map((c) => (
           <CorrelationRow key={c.with} label={c.with} value={c.value} />
@@ -145,33 +135,17 @@ export default function PredictionsPage() {
 
   return (
     <div className="space-y-6" data-testid="predictions-page">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">
-          Signal · 30D Horizon
-        </div>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-editorial-gold/80">Signal · 30D Horizon</div>
         <h1 className="font-serif text-4xl md:text-5xl mt-2 tracking-tight">
-          Probability,{" "}
-          <em className="text-editorial-gold not-italic">without the noise.</em>
+          Probability, <em className="text-editorial-gold not-italic">without the noise.</em>
         </h1>
-        <p className="text-white/55 mt-3 max-w-2xl text-[15px]">
-          Bullish/bearish odds, forecast trends, and cross-asset correlations
-          for every tracked commodity.
-        </p>
+        <p className="text-white/55 mt-3 max-w-2xl text-[15px]">Bullish/bearish odds, forecast trends, and cross-asset correlations for every tracked commodity.</p>
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {loading &&
-          Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-96" />
-          ))}
-        {!loading &&
-          preds.map((p, i) => (
-            <PredictionCard key={p.symbol} p={p} index={i} />
-          ))}
+        {loading && Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-96" />)}
+        {!loading && preds.map((p, i) => <PredictionCard key={p.symbol} p={p} index={i} />)}
       </div>
     </div>
   );

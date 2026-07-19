@@ -106,7 +106,7 @@ export function Sidebar() {
           <span className="text-xs text-white/70">All feeds nominal</span>
         </div>
         <div className="mt-3 text-[11px] text-white/40">
-          Mock data · No paid APIs
+          Live feeds • AI enriched
         </div>
       </div>
     </aside>
