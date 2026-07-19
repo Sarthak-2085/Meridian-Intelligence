@@ -4,8 +4,10 @@ from typing import List
 import json
 
 from schemas.models import NewsItem, CountryRisk, Prediction, Settings
-from services.mock_data import mock_countries, mock_commodities, mock_predictions
+from services.mock_data import mock_countries, mock_commodities
 from services.news_service import live_news
+from services.prediction_service import live_predictions
+from services.price_service import live_commodities
 from database import get_conn, save_snapshot
 
 router = APIRouter()
@@ -36,7 +38,9 @@ def country_by_code(code: str):
 
 @router.get("/predictions", response_model=List[Prediction])
 def predictions_route():
-    return mock_predictions(mock_commodities())
+    commodities = live_commodities() or mock_commodities()
+    news = live_news()
+    return live_predictions(commodities, news)
 
 
 def _load_settings() -> Settings:

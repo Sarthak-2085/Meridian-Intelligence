@@ -83,6 +83,12 @@ class Prediction(BaseModel):
     trend: List[float]
     signal: Literal["strong_buy", "buy", "neutral", "sell", "strong_sell"]
     correlations: List[dict]
+    # AI-generated fields (optional - old consumers unaffected)
+    predicted_direction: Optional[Literal["Up", "Down", "Neutral"]] = None
+    confidence: Optional[int] = None
+    time_horizon: Optional[Literal["24h", "7d"]] = None
+    reasoning: Optional[str] = None
+    risk_level: Optional[Literal["Low", "Medium", "High"]] = None
 
 
 class CommodityDetail(Commodity):
