@@ -17,6 +17,8 @@ logging.basicConfig(level=config.LOG_LEVEL)
 logger = logging.getLogger("meridian")
 
 app = FastAPI(title="Meridian Intelligence API", version="0.1.0")
+print(f"[BOOT] main.py loaded from: {__file__}")
+print(f"[BOOT] {len(app.routes)} routes registered: {[r.path for r in app.routes]}")
 api = APIRouter(prefix="/api")
 
 app.add_middleware(
@@ -56,9 +58,10 @@ api.include_router(commodities.router)
 api.include_router(misc.router)
 app.include_router(api)
 
-@app.get("/ping")
-def ping():
-    return {"status": "ok"}
+
+@app.get("/debug/routes")
+def debug_routes():
+    return [{"path": r.path, "methods": list(r.methods)} for r in app.routes]
 @app.on_event("startup")
 def _startup():
     init_db()
