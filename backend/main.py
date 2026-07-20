@@ -67,3 +67,7 @@ def _startup():
 
     print(f"[BOOT] main.py loaded from: {__file__}")
 print(f"[BOOT] {len(app.routes)} routes registered: {[r.path for r in app.routes]}")
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
