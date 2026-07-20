@@ -24,15 +24,25 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [waking, setWaking] = useState(false);
   const [query, setQuery] = useState('');
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (attempt = 0) => {
     try {
-      setLoading(true);
+      if (attempt === 0) setLoading(true);
       setErr(null);
       const d = await api.dashboard();
       setData(d);
+      setWaking(false);
     } catch (e: any) {
+      // Free-tier backend may be asleep (cold start ~30-50s). Retry a few times
+      // before surfacing a real error, with a friendly "waking up" message.
+      if (attempt < 4) {
+        setWaking(true);
+        setTimeout(() => load(attempt + 1), 8000);
+        return;
+      }
+      setWaking(false);
       setErr(e?.message || 'Unknown error');
     } finally {
       setLoading(false);
@@ -65,6 +75,14 @@ export default function DashboardPage() {
   if (loading || !data) {
     return (
       <div className="space-y-6">
+        {waking && (
+          <div className="glass rounded-2xl p-4 flex items-center gap-3 border border-editorial-gold/20" data-testid="waking-banner">
+            <span className="h-2 w-2 rounded-full bg-editorial-gold animate-pulse" />
+            <span className="text-sm text-white/70">
+              Waking up the intelligence feed — free-tier servers sleep after inactivity, this can take up to a minute on first load.
+            </span>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <Skeleton className="lg:col-span-8 h-[480px]" />
           <Skeleton className="lg:col-span-4 h-[480px]" />
